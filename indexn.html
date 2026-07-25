@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome - App News</title>
+
+  <!-- PWA & Theme Settings -->
+  <link rel="manifest" href="/news-manifest.json">
+  <meta name="theme-color" content="#8B0018">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="App News">
+  <link rel="apple-touch-icon" href="/icon.png">
+
+  <style>
+    :root {
+      --bg-light: #F8F9FA;
+      --primary-red: #8B0018;
+      --primary-dark: #580B1C;
+      --text-dark: #212529;
+      --text-gray: #6C757D;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .welcome-container {
+      max-width: 400px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    /* Icon / Logo Area */
+    .app-icon {
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(135deg, var(--primary-red), var(--primary-dark));
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(139, 0, 24, 0.25);
+    }
+
+    .app-icon svg {
+      width: 48px;
+      height: 48px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Text */
+    .title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--text-gray);
+      line-height: 1.5;
+    }
+
+    /* Button */
+    .btn-get-started {
+      width: 100%;
+      padding: 16px 24px;
+      background-color: var(--primary-red);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(139, 0, 24, 0.2);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-get-started:active {
+      transform: scale(0.98);
+      background-color: var(--primary-dark);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="welcome-container">
+    <!-- Logo -->
+    <div class="app-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2m-4-3H9M9 12h6m-6 4h6"/>
+      </svg>
+    </div>
+
+    <!-- Title & Subtitle -->
+    <div>
+      <h1 class="title">App News</h1>
+      <p class="subtitle">Stay updated with today's latest news, sports, entertainment, and tech headlines.</p>
+    </div>
+
+    <!-- Action Button -->
+    <a href="AppNews.html" class="btn-get-started">Get Started</a>
+  </div>
+
+</body>
+</html>
