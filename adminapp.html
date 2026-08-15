@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - App & Link Manager</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f8; padding: 20px; max-width: 550px; margin: auto; }
+    
+    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .back-btn { background: #333; color: white; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 14px; font-weight: 600; }
+
+    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    h2 { color: #8B0018; margin-bottom: 16px; font-size: 18px; margin-top: 0; }
+
+    label { font-size: 12px; font-weight: bold; margin-bottom: 4px; display: block; color: #333; }
+    input, select, textarea { 
+      width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; 
+      border-radius: 6px; box-sizing: border-box; background: #fff; font-size: 14px; font-family: inherit;
+    }
+
+    textarea { resize: vertical; min-height: 70px; }
+
+    .row-2 { display: flex; gap: 10px; }
+    .row-2 > div { flex: 1; }
+
+    .search-box-container { margin-bottom: 16px; }
+    .search-input { 
+      border: 2px solid #8B0018 !important; 
+      border-radius: 8px !important; 
+      padding: 11px !important; 
+      font-size: 14px !important;
+      margin-bottom: 0 !important;
+    }
+
+    /* Paid App PIN Box Styling */
+    .pin-manager-box {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .pin-display-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .pin-input-field {
+      font-size: 16px !important;
+      font-weight: 800 !important;
+      letter-spacing: 2px;
+      color: #8B0018 !important;
+      text-align: center;
+      margin-bottom: 0 !important;
+      background: #fff !important;
+    }
+    .btn-pin-action {
+      background: #8B0018;
+      color: white;
+      border: none;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-pin-secondary {
+      background: #0d6efd;
+    }
+
+    .pin-list {
+      max-height: 120px;
+      overflow-y: auto;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 6px;
+      margin-top: 6px;
+    }
+    .pin-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 8px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 12px;
+    }
+    .pin-item:last-child { border-bottom: none; }
+    .pin-code { font-weight: bold; color: #111; font-family: monospace; font-size: 13px; }
+    .pin-status-active { color: #2e7d32; font-weight: bold; }
+    .pin-status-used { color: #c62828; text-decoration: line-through; }
+
+    .test-box {
+      display: none; flex-direction: column; gap: 10px; padding: 14px;
+      background: #f8f9fa; border: 1px solid #cbd5e1; border-radius: 10px; margin-bottom: 16px;
+    }
+    .icon-header-preview { display: flex; align-items: center; gap: 12px; }
+    .icon-header-preview img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; background: #fff; border: 1px solid #ddd; }
+    
+    .iframe-wrapper {
+      width: 100%; height: 260px; border: 2px dashed #94a3b8; border-radius: 8px;
+      overflow: hidden; background: #ffffff; position: relative;
+    }
+    .iframe-wrapper iframe { width: 100%; height: 100%; border: none; }
+
+    .manual-test-actions { display: flex; gap: 10px; margin-top: 4px; }
+    .btn-choice {
+      flex: 1; padding: 10px 12px; border: 2px solid transparent; border-radius: 8px;
+      font-weight: bold; font-size: 13px; cursor: pointer; text-align: center;
+      transition: all 0.2s ease; opacity: 0.65;
+    }
+    .btn-choice.active { opacity: 1; transform: scale(1.02); }
+    .btn-choice-valid { background: #d1e7dd; color: #0f5132; border-color: #0f5132; }
+    .btn-choice-invalid { background: #f8d7da; color: #842029; border-color: #842029; }
+
+    .btn-submit { width: 100%; padding: 12px; background: #8B0018; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
+    .btn-submit:disabled { background: #a55c67; cursor: not-allowed; }
+    .btn-cancel { width: 100%; padding: 10px; background: #6c757d; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: margin-top: 6px; display: none; }
+    .status { margin-top: 10px; font-size: 13px; text-align: center; font-weight: 600; }
+
+    .category-header { font-size: 14px; font-weight: 700; padding: 8px 12px; border-radius: 6px; margin: 16px 0 10px 0; }
+    .cat-valid { background: #e8f5e9; color: #1b5e20; border-left: 4px solid #2e7d32; }
+    .cat-invalid { background: #ffebee; color: #b71c1c; border-left: 4px solid #c62828; }
+    .cat-store { background: #eef2f5; color: #1c2d42; border-left: 4px solid #4a6572; }
+
+    .app-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .app-info-admin { display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden; }
+    .app-info-admin img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
+    .app-info-admin strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
+    .app-info-admin small { color: #6c757d; display: block; font-size: 11px; word-break: break-all; }
+    .meta-pills { font-size: 10px; color: #8B0018; font-weight: bold; margin-top: 2px; }
+    
+    .price-badge { padding: 1px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; }
+    .price-badge.free { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+    .price-badge.paid { background: #fff3cd; color: #664d03; border: 1px solid #ffe69c; }
+
+    .badge-system { background: #0d6efd; color: white; padding: 1px 5px; border-radius: 4px; font-size: 9px; font-weight: bold; margin-left: 4px; }
+
+    .action-group { display: flex; gap: 6px; flex-shrink: 0; }
+    .btn-edit { background: #0d6efd; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+    .btn-delete { background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <div class="top-bar">
+    <a href="new.html" class="back-btn">&#x2190; Back</a>
+  </div>
+
+  <div class="card">
+    <h2 id="formTitle">Add New Link / App</h2>
+    <input type="hidden" id="editKey">
+    
+    <label for="appType">Link Type:</label>
+    <select id="appType" onchange="debouncedPreview()">
+      <option value="website">Website / Web App</option>
+      <option value="playstore">Google Play Store</option>
+      <option value="appstore">Apple App Store</option>
+    </select>
+
+    <label for="appName">App / Website Name:</label>
+    <input type="text" id="appName" placeholder="e.g. Birr Go News">
+
+    <label for="appDesc">Description / Full Article:</label>
+    <textarea id="appDesc" placeholder="Enter full description or app features..."></textarea>
+
+    <label for="appUrl">URL Target:</label>
+    <input type="url" id="appUrl" placeholder="https://example.com/ or store link" oninput="debouncedPreview()">
+
+    <label for="isSystemApp">App Protection Level:</label>
+    <select id="isSystemApp">
+      <option value="false">Standard App (Uninstallable)</option>
+      <option value="true">🛡️ System App (Non-Uninstallable)</option>
+    </select>
+
+    <div class="row-2">
+      <div>
+        <label for="pricingType">Access Model:</label>
+        <select id="pricingType" onchange="togglePriceInput()">
+          <option value="free">Free</option>
+          <option value="paid">Paid</option>
+        </select>
+      </div>
+      <div id="priceBox" style="display: none;">
+        <label for="appPrice">Price Amount (e.g. 50 ETB):</label>
+        <input type="number" id="appPrice" placeholder="50">
+      </div>
+    </div>
+
+    <!-- Single-Use PIN Manager for Paid Apps -->
+    <div id="pinManagerBox" class="pin-manager-box" style="display: none;">
+      <label>🔑 Single-Use App Access PIN Generator:</label>
+      <div class="pin-display-group">
+        <input type="text" id="activePinInput" class="pin-input-field" placeholder="Click Generate PIN" readonly>
+        <button type="button" class="btn-pin-action" onclick="generateNewSingleUsePin()">⚡ Generate PIN</button>
+        <button type="button" class="btn-pin-action btn-pin-secondary" onclick="copyActivePin()">📋 Copy</button>
+      </div>
+      <small style="display:block; color:#666; margin-bottom: 6px;">Each PIN works for <b>1 person only</b>. When used, a new PIN generates automatically.</small>
+
+      <label style="margin-top: 8px;">Active & History Single-Use PINs:</label>
+      <div id="pinListContainer" class="pin-list">
+        <div style="color:#888; font-size:11px; text-align:center;">No PIN generated yet.</div>
+      </div>
+    </div>
+
+    <label for="adminPhone">Admin Phone Number (Receiving Wallet Account):</label>
+    <input type="text" id="adminPhone" placeholder="e.g. 0912345678 or 251912345678">
+
+    <label for="adminCardChoice">Deposit Account Option:</label>
+    <select id="adminCardChoice" onchange="toggleCardNumberInput()">
+      <option value="default">Default Admin (1111111111111)</option>
+      <option value="custom">Other / Custom Card Number</option>
+    </select>
+
+    <label for="targetCardNumber">Deposit Receiving Card / Account Number:</label>
+    <input type="text" id="targetCardNumber" value="1111111111111" placeholder="e.g. 1000123456789" readonly style="background-color: #eef2f5; font-weight: bold; color: #1b5e20;">
+
+    <label for="customIcon">Custom Icon Image URL (Optional - Overrides Auto Fetch):</label>
+    <input type="url" id="customIcon" placeholder="https://example.com/custom-icon.png" oninput="debouncedPreview()">
+
+    <div class="row-2">
+      <div>
+        <label for="userRating">User Rating (App Review):</label>
+        <input type="text" id="userRating" placeholder="e.g. 4.8 ★">
+      </div>
+      <div>
+        <label for="systemRating">System Rating:</label>
+        <input type="text" id="systemRating" placeholder="e.g. PEGI 3 / Everyone">
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div>
+        <label for="appSize">App Size:</label>
+        <input type="text" id="appSize" placeholder="e.g. 12.5 MB">
+      </div>
+      <div>
+        <label for="downloads">Total Downloads:</label>
+        <input type="text" id="downloads" placeholder="e.g. 50K+ / 1M+">
+      </div>
+    </div>
+
+    <div id="testBox" class="test-box">
+      <div class="icon-header-preview">
+        <img id="iconPreviewImg" src="" alt="Icon Preview" onerror="this.src='https://via.placeholder.com/48?text=Icon'">
+        <div>
+          <strong style="font-size: 13px; color: #333;">Live iFrame Manual Test</strong>
+          <small style="display:block; color:#666;">Check if website opens below, then select category.</small>
+        </div>
+      </div>
+
+      <div id="iframeContainer" class="iframe-wrapper">
+        <iframe id="previewIframe" src="about:blank"></iframe>
+      </div>
+
+      <div class="manual-test-actions" id="manualActions">
+        <button type="button" id="btnValid" class="btn-choice btn-choice-valid active" onclick="setManualChoice('valid')">
+          🟢 Valid (iFrame Opened)
+        </button>
+        <button type="button" id="btnInvalid" class="btn-choice btn-choice-invalid" onclick="setManualChoice('invalid')">
+          🔴 Invalid (Frame Blocked)
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="saveBtn" onclick="saveWebsite()">Add Item</button>
+    <button class="btn-cancel" id="cancelBtn" onclick="resetForm()">Cancel Edit</button>
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h2 style="margin:0;">Database Sync</h2>
+      <span style="font-size:12px; color:#666; font-weight:bold;">Total Apps: <span id="totalCount">0</span></span>
+    </div>
+
+    <div class="search-box-container">
+      <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search apps by name, link, or price..." oninput="renderAppList()">
+    </div>
+
+    <div id="adminAppList">Loading database...</div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD9rJzhpR8IV0sTTgPOezZoh3qJpvI6Gjk",
+      authDomain: "hulum-e358c.firebaseapp.com",
+      databaseURL: "https://hulum-e358c-default-rtdb.firebaseio.com",
+      projectId: "hulum-e358c",
+      storageBucket: "hulum-e358c.firebasestorage.app",
+      messagingSenderId: "678316597629",
+      appId: "1:678316597629:web:dc6af499b8054a424aac14",
+      measurementId: "G-097P51SP2B"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let verifiedIconUrl = "";
+    let selectedManualCategory = "valid";
+    let debounceTimer = null;
+    let localAppsCache = []; 
+    let currentAppPins = {};
+
+    function togglePriceInput() {
+      const type = document.getElementById('pricingType').value;
+      const priceBox = document.getElementById('priceBox');
+      const pinBox = document.getElementById('pinManagerBox');
+      
+      const isPaid = (type === 'paid');
+      priceBox.style.display = isPaid ? 'block' : 'none';
+      pinBox.style.display = isPaid ? 'block' : 'none';
+
+      if (!isPaid) {
+        document.getElementById('appPrice').value = '';
+      } else if (!document.getElementById('activePinInput').value) {
+        generateNewSingleUsePin();
+      }
+    }
+
+    /* Single-Use PIN Generator Functions */
+    function generateRandomPin() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    function generateNewSingleUsePin() {
+      const newPin = generateRandomPin();
+      document.getElementById('activePinInput').value = newPin;
+
+      const editKey = document.getElementById('editKey').value;
+      if (editKey) {
+        // Direct save to Firebase if editing existing app
+        const pinRef = db.ref(`pwa_apps/${editKey}/pins/${newPin}`);
+        pinRef.set({
+          code: newPin,
+          used: false,
+          maxUses: 1,
+          usedCount: 0,
+          createdAt: Date.now(),
+          autoRegenerateOnUse: true
+        });
+      }
+    }
+
+    function copyActivePin() {
+      const pinInput = document.getElementById('activePinInput');
+      if (!pinInput.value) return;
+      navigator.clipboard.writeText(pinInput.value);
+      alert("PIN Copied to Clipboard: " + pinInput.value);
+    }
+
+    function listenToAppPins(appKey) {
+      if (!appKey) return;
+      db.ref(`pwa_apps/${appKey}/pins`).on('value', (snapshot) => {
+        currentAppPins = snapshot.val() || {};
+        renderPinList(appKey);
+      });
+    }
+
+    function renderPinList(appKey) {
+      const container = document.getElementById('pinListContainer');
+      const activeInput = document.getElementById('activePinInput');
+      
+      if (!container) return;
+
+      const pinsArray = Object.values(currentAppPins);
+      if (pinsArray.length === 0) {
+        container.innerHTML = '<div style="color:#888; font-size:11px; text-align:center;">No PIN generated yet.</div>';
+        return;
+      }
+
+      pinsArray.sort((a, b) => b.createdAt - a.createdAt);
+
+      let html = '';
+      let foundUnused = false;
+
+      pinsArray.forEach((pin) => {
+        const isUsed = pin.used === true || (pin.usedCount && pin.usedCount >= (pin.maxUses || 1));
+        
+        if (!isUsed && !foundUnused) {
+          activeInput.value = pin.code;
+          foundUnused = true;
+        }
+
+        html += `
+          <div class="pin-item">
+            <span class="pin-code">${pin.code}</span>
+            <span class="${isUsed ? 'pin-status-used' : 'pin-status-active'}">
+              ${isUsed ? '🔴 Used (1/1)' : '🟢 Active (1 person)'}
+            </span>
+            <button type="button" style="padding:2px 6px; font-size:10px; background:#dc3545; color:white; border:none; border-radius:3px; cursor:pointer;" onclick="deletePin('${appKey}', '${pin.code}')">✕</button>
+          </div>
+        `;
+      });
+
+      // Auto-regenerate replacement PIN if all are used
+      if (!foundUnused && pinsArray.length > 0) {
+        const activeApp = localAppsCache.find(x => x.key === appKey);
+        if (activeApp && activeApp.app.pricingType === 'paid') {
+          generateNewSingleUsePin();
+        }
+      }
+
+      container.innerHTML = html;
+    }
+
+    function deletePin(appKey, pinCode) {
+      if (confirm(`Delete PIN ${pinCode}?`)) {
+        db.ref(`pwa_apps/${appKey}/pins/${pinCode}`).remove();
+      }
+    }
+
+    /* Redeem/Use PIN logic - Triggers Auto-Regeneration for 1 Person Use */
+    function verifyAndUsePin(appKey, inputPin, callback) {
+      const pinRef = db.ref(`pwa_apps/${appKey}/pins/${inputPin}`);
+      pinRef.once('value', (snapshot) => {
+        if (!snapshot.exists()) {
+          callback(false, "Invalid PIN code.");
+          return;
+        }
+
+        const pinData = snapshot.val();
+        if (pinData.used || pinData.usedCount >= (pinData.maxUses || 1)) {
+          callback(false, "This PIN has already been used by 1 person.");
+          return;
+        }
+
+        // Mark PIN as Used
+        pinRef.update({
+          used: true,
+          usedCount: 1,
+          usedAt: Date.now()
+        }).then(() => {
+          // Auto-generate fresh single-use PIN for next customer
+          const newGeneratedPin = generateRandomPin();
+          db.ref(`pwa_apps/${appKey}/pins/${newGeneratedPin}`).set({
+            code: newGeneratedPin,
+            used: false,
+            maxUses: 1,
+            usedCount: 0,
+            createdAt: Date.now(),
+            autoRegenerateOnUse: true
+          });
+
+          callback(true, "PIN Verified Successfully!");
+        }).catch((err) => callback(false, err.message));
+      });
+    }
+
+    function toggleCardNumberInput() {
+      const choice = document.getElementById('adminCardChoice').value;
+      const cardInput = document.getElementById('targetCardNumber');
+      
+      if (choice === 'default') {
+        cardInput.value = '1111111111111';
+        cardInput.readOnly = true;
+        cardInput.style.backgroundColor = '#eef2f5';
+        cardInput.style.color = '#1b5e20';
+      } else {
+        cardInput.readOnly = false;
+        cardInput.style.backgroundColor = '#fff';
+        cardInput.style.color = '#333';
+        if (cardInput.value === '1111111111111') cardInput.value = '';
+        cardInput.focus();
+      }
+    }
+
+    function setManualChoice(choice) {
+      selectedManualCategory = choice;
+      const btnValid = document.getElementById('btnValid');
+      const btnInvalid = document.getElementById('btnInvalid');
+
+      if (choice === 'valid') {
+        btnValid.classList.add('active');
+        btnInvalid.classList.remove('active');
+      } else {
+        btnInvalid.classList.add('active');
+        btnValid.classList.remove('active');
+      }
+    }
+
+    function getPlayStoreIconUrl(appUrl) {
+      try {
+        const urlObj = new URL(appUrl.startsWith('http') ? appUrl : 'https://' + appUrl);
+        const packageId = urlObj.searchParams.get('id');
+        if (packageId) return `https://unavatar.io/google-play/${packageId}`;
+      } catch(e) {}
+      return null;
+    }
+
+    async function fetchAppleAppIcon(appUrl) {
+      try {
+        const match = appUrl.match(/id(\d+)/);
+        if (match && match[1]) {
+          const res = await fetch(`https://itunes.apple.com/lookup?id=${match[1]}`);
+          const data = await res.json();
+          if (data.results && data.results.length > 0) {
+            return data.results[0].artworkUrl512 || data.results[0].artworkUrl100;
+          }
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function debouncedPreview() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(updateLiveTestAndPreview, 400);
+    }
+
+    async function updateLiveTestAndPreview() {
+      let rawUrl = document.getElementById('appUrl').value.trim();
+      let customIcon = document.getElementById('customIcon').value.trim();
+      const sourceType = document.getElementById('appType').value;
+      const testBox = document.getElementById('testBox');
+      const previewImg = document.getElementById('iconPreviewImg');
+      const iframeContainer = document.getElementById('iframeContainer');
+      const previewIframe = document.getElementById('previewIframe');
+      const manualActions = document.getElementById('manualActions');
+
+      if (!rawUrl && !customIcon) { 
+        testBox.style.display = 'none'; 
+        previewIframe.src = "about:blank";
+        return; 
+      }
+
+      if (rawUrl && !/^https?:\/\//i.test(rawUrl)) rawUrl = 'https://' + rawUrl;
+
+      testBox.style.display = 'flex';
+
+      if (customIcon) {
+        verifiedIconUrl = customIcon;
+        previewImg.src = customIcon;
+      } 
+      else if (sourceType === 'playstore' && rawUrl) {
+        const realPlayIcon = getPlayStoreIconUrl(rawUrl);
+        verifiedIconUrl = realPlayIcon || "https://cdn-icons-png.flaticon.com/512/888/888857.png";
+        previewImg.src = verifiedIconUrl;
+      } 
+      else if (sourceType === 'appstore' && rawUrl) {
+        previewImg.src = "https://via.placeholder.com/48?text=Loading";
+        const realAppleIcon = await fetchAppleAppIcon(rawUrl);
+        verifiedIconUrl = realAppleIcon || "https://cdn-icons-png.flaticon.com/512/888/888841.png";
+        previewImg.src = verifiedIconUrl;
+      } 
+      else if (rawUrl) {
+        try {
+          const domain = new URL(rawUrl).hostname;
+          if (domain) {
+            verifiedIconUrl = `https://icon.horse/icon/${domain}`;
+            previewImg.src = verifiedIconUrl;
+          }
+        } catch(e) {}
+      }
+
+      if (sourceType === 'playstore' || sourceType === 'appstore') {
+        iframeContainer.style.display = 'none';
+        manualActions.style.display = 'none';
+        previewIframe.src = "about:blank";
+      } else {
+        iframeContainer.style.display = 'block';
+        manualActions.style.display = 'flex';
+        if (rawUrl && previewIframe.src !== rawUrl) {
+          previewIframe.src = rawUrl;
+        }
+      }
+    }
+
+    async function saveWebsite() {
+      const editKey = document.getElementById('editKey').value;
+      const sourceType = document.getElementById('appType').value;
+      const name = document.getElementById('appName').value.trim();
+      const desc = document.getElementById('appDesc').value.trim();
+      let url = document.getElementById('appUrl').value.trim();
+      
+      const isSystemApp = document.getElementById('isSystemApp').value === 'true';
+
+      const pricingType = document.getElementById('pricingType').value;
+      const appPrice = pricingType === 'paid' ? (parseFloat(document.getElementById('appPrice').value) || 0) : 0;
+      const activePin = document.getElementById('activePinInput').value.trim();
+      const adminPhone = document.getElementById('adminPhone').value.trim();
+      const depositCardNumber = document.getElementById('targetCardNumber').value.trim() || '1111111111111';
+      const customIcon = document.getElementById('customIcon').value.trim();
+      
+      const userRating = document.getElementById('userRating').value.trim() || "4.8 ★";
+      const systemRating = document.getElementById('systemRating').value.trim() || "PEGI 3";
+      const size = document.getElementById('appSize').value.trim() || "12.5 MB";
+      const downloads = document.getElementById('downloads').value.trim() || "50K+";
+
+      const status = document.getElementById('status');
+      const saveBtn = document.getElementById('saveBtn');
+
+      if (!name || !url) { alert("Please enter Name and URL!"); return; }
+      if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+      let canIframe = false;
+      let category = "store";
+
+      if (sourceType === 'website') {
+        canIframe = (selectedManualCategory === 'valid');
+        category = selectedManualCategory;
+      }
+
+      let domain = url;
+      try { domain = new URL(url).hostname; } catch(e) {}
+
+      const finalIcon = customIcon || verifiedIconUrl || `https://icon.horse/icon/${domain}`;
+
+      const payload = {
+        name: name,
+        description: desc || "No description provided.",
+        url: url,
+        sourceType: sourceType,
+        isSystemApp: isSystemApp,
+        pricingType: pricingType,
+        price: appPrice,
+        adminPhone: adminPhone,
+        depositCardNumber: depositCardNumber,
+        customIcon: customIcon,
+        icon: finalIcon,
+        canIframe: canIframe,
+        category: category,
+        userRating: userRating,
+        systemRating: systemRating,
+        size: size,
+        downloads: downloads,
+        timestamp: Date.now()
+      };
+
+      saveBtn.disabled = true;
+      status.style.color = '#0d6efd';
+      status.textContent = "Saving item to Firebase database...";
+
+      const handlePinSave = (appKey) => {
+        if (pricingType === 'paid' && activePin) {
+          db.ref(`pwa_apps/${appKey}/pins/${activePin}`).set({
+            code: activePin,
+            used: false,
+            maxUses: 1,
+            usedCount: 0,
+            createdAt: Date.now(),
+            autoRegenerateOnUse: true
+          });
+        }
+      };
+
+      if (editKey) {
+        db.ref('pwa_apps/' + editKey).update(payload, (err) => {
+          saveBtn.disabled = false;
+          if (err) {
+            status.style.color = 'red';
+            status.textContent = "Error saving: " + err.message;
+          } else {
+            handlePinSave(editKey);
+            status.style.color = 'green';
+            status.textContent = "Item updated successfully!";
+            resetForm();
+            fetchAppsData();
+          }
+        });
+      } else {
+        const newRef = db.ref('pwa_apps').push();
+        newRef.set(payload, (err) => {
+          saveBtn.disabled = false;
+          if (err) {
+            status.style.color = 'red';
+            status.textContent = "Error saving: " + err.message;
+          } else {
+            handlePinSave(newRef.key);
+            status.style.color = 'green';
+            status.textContent = "Item saved!";
+            resetForm();
+            fetchAppsData();
+          }
+        });
+      }
+    }
+
+    function editWebsite(key) {
+      const item = localAppsCache.find(x => x.key === key);
+      if (!item) return;
+      const app = item.app;
+
+      document.getElementById('editKey').value = key;
+      document.getElementById('appType').value = app.sourceType || 'website';
+      document.getElementById('appName').value = app.name || '';
+      document.getElementById('appDesc').value = app.description || '';
+      document.getElementById('appUrl').value = app.url || '';
+      
+      document.getElementById('isSystemApp').value = app.isSystemApp ? 'true' : 'false';
+
+      document.getElementById('pricingType').value = app.pricingType || 'free';
+      document.getElementById('appPrice').value = app.price && app.price !== 0 ? app.price : '';
+      document.getElementById('adminPhone').value = app.adminPhone || app.ownerPhone || '';
+      
+      const cardNum = app.depositCardNumber || '1111111111111';
+      document.getElementById('adminCardChoice').value = (cardNum === '1111111111111') ? 'default' : 'custom';
+      document.getElementById('targetCardNumber').value = cardNum;
+      
+      toggleCardNumberInput();
+      togglePriceInput();
+      listenToAppPins(key);
+
+      document.getElementById('customIcon').value = app.customIcon || '';
+      document.getElementById('userRating').value = app.userRating || '';
+      document.getElementById('systemRating').value = app.systemRating || '';
+      document.getElementById('appSize').value = app.size || '';
+      document.getElementById('downloads').value = app.downloads || '';
+
+      const appCategory = app.category || (app.canIframe ? 'valid' : 'invalid');
+      setManualChoice(appCategory === 'invalid' ? 'invalid' : 'valid');
+
+      document.getElementById('formTitle').textContent = "Edit Link / App";
+      document.getElementById('saveBtn').textContent = "Update Item";
+      document.getElementById('cancelBtn').style.display = "block";
+      
+      updateLiveTestAndPreview();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+      const editKey = document.getElementById('editKey').value;
+      if (editKey) {
+        db.ref(`pwa_apps/${editKey}/pins`).off();
+      }
+
+      document.getElementById('editKey').value = '';
+      document.getElementById('appType').value = 'website';
+      document.getElementById('appName').value = '';
+      document.getElementById('appDesc').value = '';
+      document.getElementById('appUrl').value = '';
+      
+      document.getElementById('isSystemApp').value = 'false';
+
+      document.getElementById('pricingType').value = 'free';
+      document.getElementById('appPrice').value = '';
+      document.getElementById('activePinInput').value = '';
+      document.getElementById('pinListContainer').innerHTML = '<div style="color:#888; font-size:11px; text-align:center;">No PIN generated yet.</div>';
+      
+      document.getElementById('adminPhone').value = '';
+      document.getElementById('adminCardChoice').value = 'default';
+      
+      toggleCardNumberInput();
+      togglePriceInput();
+
+      document.getElementById('customIcon').value = '';
+      document.getElementById('userRating').value = '';
+      document.getElementById('systemRating').value = '';
+      document.getElementById('appSize').value = '';
+      document.getElementById('downloads').value = '';
+
+      setManualChoice('valid');
+      document.getElementById('previewIframe').src = 'about:blank';
+      document.getElementById('testBox').style.display = 'none';
+
+      document.getElementById('formTitle').textContent = "Add New Link / App";
+      document.getElementById('saveBtn').textContent = "Add Item";
+      document.getElementById('cancelBtn').style.display = "none";
+      document.getElementById('status').textContent = '';
+      document.getElementById('saveBtn').disabled = false;
+    }
+
+    function deleteWebsite(key) {
+      if (confirm("Delete this item from database?")) {
+        db.ref('pwa_apps/' + key).remove().then(() => fetchAppsData());
+      }
+    }
+
+    function fetchAppsData() {
+      db.ref('pwa_apps').once('value', (snapshot) => {
+        localAppsCache = [];
+        if (snapshot.exists()) {
+          snapshot.forEach((child) => {
+            localAppsCache.push({ key: child.key, app: child.val() });
+          });
+        }
+        renderAppList();
+      });
+    }
+
+    fetchAppsData();
+
+    function renderAppList() {
+      const totalCount = document.getElementById('totalCount');
+      const adminAppList = document.getElementById('adminAppList');
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+
+      if (localAppsCache.length === 0) {
+        totalCount.textContent = '0';
+        adminAppList.innerHTML = '<p style="color:#6c757d; padding:10px 0;">No items in database.</p>';
+        return;
+      }
+
+      const filtered = localAppsCache.filter(({ app }) => {
+        const name = (app.name || '').toLowerCase();
+        const url = (app.url || '').toLowerCase();
+        const desc = (app.description || '').toLowerCase();
+        const price = (app.price ? app.price.toString() : '').toLowerCase();
+        const pricingType = (app.pricingType || '').toLowerCase();
+        const sourceType = (app.sourceType || '').toLowerCase();
+        return name.includes(searchQuery) || url.includes(searchQuery) || desc.includes(searchQuery) || price.includes(searchQuery) || pricingType.includes(searchQuery) || sourceType.includes(searchQuery);
+      });
+
+      const validItems = [];
+      const invalidItems = [];
+      const storeItems = [];
+
+      filtered.forEach(({ key, app }) => {
+        const category = app.category || (app.sourceType && app.sourceType !== 'website' ? 'store' : (app.canIframe ? 'valid' : 'invalid'));
+
+        if (category === 'valid') validItems.push({ key, app });
+        else if (category === 'invalid') invalidItems.push({ key, app });
+        else storeItems.push({ key, app });
+      });
+
+      totalCount.textContent = `${filtered.length}`;
+
+      if (filtered.length === 0) {
+        adminAppList.innerHTML = '<p style="color:#6c757d; text-align:center; padding:15px;">No matching apps found.</p>';
+        return;
+      }
+
+      let htmlBuffer = '';
+
+      if (validItems.length > 0) {
+        htmlBuffer += `<div class="category-header cat-valid">🟢 Category: Valid (${validItems.length})</div>`;
+        validItems.forEach(({ key, app }) => htmlBuffer += createRow(key, app));
+      }
+
+      if (invalidItems.length > 0) {
+        htmlBuffer += `<div class="category-header cat-invalid">🔴 Category: Invalid (${invalidItems.length})</div>`;
+        invalidItems.forEach(({ key, app }) => htmlBuffer += createRow(key, app));
+      }
+
+      if (storeItems.length > 0) {
+        htmlBuffer += `<div class="category-header cat-store">📱 Category: App Store / Play Store (${storeItems.length})</div>`;
+        storeItems.forEach(({ key, app }) => htmlBuffer += createRow(key, app));
+      }
+
+      adminAppList.innerHTML = htmlBuffer;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function createRow(key, app) {
+      const safePricingType = app.pricingType || 'free';
+      const safePrice = app.price || 0;
+      const safeType = app.sourceType || 'website';
+
+      const isPaid = safePricingType === 'paid' && safePrice > 0;
+      const priceBadgeHtml = isPaid 
+        ? `<span class="price-badge paid">💰 Price: ${safePrice} ETB (🔑 Single-Use PIN)</span> | ` 
+        : `<span class="price-badge free">🆓 Free</span> | `;
+
+      const systemBadge = app.isSystemApp ? `<span class="badge-system">🛡️ System App</span>` : '';
+
+      return `
+        <div class="app-item">
+          <div class="app-info-admin">
+            <img src="${escapeHtml(app.icon)}" alt="Icon" onerror="this.src='https://via.placeholder.com/36?text=Icon'">
+            <div>
+              <strong>${escapeHtml(app.name)} <small style="display:inline; color:#888;">(${escapeHtml(safeType)})</small> ${systemBadge}</strong>
+              <small>${escapeHtml(app.url)}</small>
+              <div class="meta-pills">${priceBadgeHtml}⭐ ${escapeHtml(app.userRating || '4.8 ★')} | 🛡️ ${escapeHtml(app.systemRating || 'PEGI 3')} | 📦 ${escapeHtml(app.size || '12.5 MB')} | 📥 ${escapeHtml(app.downloads || '50K+')}</div>
+            </div>
+          </div>
+          <div class="action-group">
+            <button class="btn-edit" onclick="editWebsite('${key}')">Edit</button>
+            <button class="btn-delete" onclick="deleteWebsite('${key}')">Delete</button>
+          </div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
