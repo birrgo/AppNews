@@ -7,7 +7,7 @@
     <!-- Force all menu links to open in the full window -->
     <base target="_top">
 
-    <title>Shikela - Navigation Menu</title>
+    <title>Hulum - Navigation Menu</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,29 +21,36 @@
             padding: 0 10px;
         }
 
-        /* 3D Dark Blur Card Styling */
+        /* 3D Dark Blue Blur Card Styling */
         .menu-card {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(15, 23, 42, 0.75);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(11, 19, 43, 0.9) 100%);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(37, 99, 235, 0.25);
             padding: 18px 22px;
             border-radius: 16px;
             color: #ffffff;
             text-decoration: none;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 
+            box-shadow: 0 8px 20px rgba(2, 6, 23, 0.6), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        /* Hover & Active States */
+        .menu-card:hover {
+            border-color: rgba(37, 99, 235, 0.5);
+            box-shadow: 0 8px 25px rgba(29, 78, 216, 0.25), 
                         inset 0 1px 0 rgba(255, 255, 255, 0.15);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }
 
         .menu-card:active {
             transform: translateY(2px) scale(0.98);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            background: rgba(15, 23, 42, 0.85);
+            box-shadow: 0 4px 10px rgba(2, 6, 23, 0.5), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            background: linear-gradient(135deg, rgba(11, 19, 43, 0.95) 0%, rgba(8, 14, 30, 0.95) 100%);
         }
 
         .menu-card-left {
@@ -52,15 +59,16 @@
             gap: 16px;
         }
 
+        /* Dark Blue Accent Icons */
         .menu-icon {
             width: 24px;
             height: 24px;
-            stroke: #38bdf8;
+            stroke: #2563eb;
             stroke-width: 2.2;
             fill: none;
             stroke-linecap: round;
             stroke-linejoin: round;
-            filter: drop-shadow(0 2px 4px rgba(56, 189, 248, 0.3));
+            filter: drop-shadow(0 2px 6px rgba(37, 99, 235, 0.4));
         }
 
         .menu-title {
@@ -74,9 +82,10 @@
         .chevron-icon {
             width: 20px;
             height: 20px;
-            stroke: rgba(255, 255, 255, 0.6);
+            stroke: #3b82f6;
             stroke-width: 2.5;
             fill: none;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -88,13 +97,13 @@
             <path d="M0 0H375V75C375 75 280 155 0 95V0Z" fill="url(#paint0_linear)"/>
             <defs>
                 <linearGradient id="paint0_linear" x1="187.5" y1="0" x2="187.5" y2="200" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#081B38"/>
-                    <stop offset="1" stop-color="#0F2C59"/>
+                    <stop stop-color="#030712"/>
+                    <stop offset="1" stop-color="#0B132B"/>
                 </linearGradient>
             </defs>
         </svg>
 
-        <!-- Navigation Header (Timer Removed) -->
+        <!-- Navigation Header -->
         <header class="nav-header">
             <div class="header-left-group">
                 <h1 class="header-title-text" style="font-size: 22px; font-weight: 800;">Menu</h1>
@@ -144,12 +153,10 @@
             </div>
 
             <footer class="verified-footer-shield" style="margin-top: 40px; margin-bottom: 20px;">
-                <span class="footer-shield-text">Shikela Secure Matrix Verified</span>
+                <span class="footer-shield-text">Hulum Verified</span>
             </footer>
         </main>
     </div>
 
 </body>
 </html>
-
-Change to hulum
