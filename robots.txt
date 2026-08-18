@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-# Direct link to your sitemap
+# Sitemap
 Sitemap: https://hulum.online/sitemap.xml
